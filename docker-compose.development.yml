@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  postal:
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+    volumes:
+      - .:/opt/postal
+    ports:
+      - 3000:3000
+
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_DATABASE: postal
+      MARIADB_ALLOW_EMPTY_PASSWORD: 'yes'
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'yes'
+    ports:
+      - "3306:3306"
+
+  rabbitmq:
+    image: rabbitmq:3
+    restart: always
+    ports:
+      - "5672:5672"

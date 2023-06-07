@@ -1,0 +1,24 @@
+FROM ruby:3.2.1-bullseye AS base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs default-mysql-client less vim iproute2 dnsutils
+
+WORKDIR /opt/postal
+
+ENV RAILS_ENV=development
+
+COPY Gemfile Gemfile.lock ./
+
+# RUN bundle install
+RUN bundle install --path /opt/postal-bundle
+
+ENV POSTAL_ENV=development
+ENV POSTAL_CONFIG_ROOT=/opt/postal/config
+
+# Ensure binding is always 0.0.0.0, even in development, to access server from outside container
+# Borrowed from https://github.com/rails/docked/blob/f8acb500d89303d23ee491309500d373671459b0/Dockerfile#L26
+ENV BINDING="0.0.0.0"
+
+CMD ["bundle", "exec", "rails", "s"]
+# CMD tail -f /dev/null
